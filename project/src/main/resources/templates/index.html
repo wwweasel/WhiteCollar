@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments :: head"></head>
+
+<body>
+
+<div class="container-fluid">
+	<div class="card" style="margin-top: 1.5em;">
+		<form action="#" th:action="@{/stores/create}" th:method="GET" th:object="${stores}">
+			
+			<div class="card-header">
+				<h6>WhiteCollar</h6>
+			</div>
+		
+			<div class="card-body">
+				<div th:if="${stores} == null or ${stores.size()} == 0"><!--th:if="${stores == null}"  -->
+				  <p>There are no Stores yet.</p>
+				</div>
+				<div th:unless="${stores} == null or ${stores.size()} == 0">
+					<table class="table table table-hover">
+						<thead>
+							<tr>
+								<th>ID</th>
+								<th>Name</th>
+								<th>Capacity</th>
+								<th>Load</th>
+								<th></th>
+							</tr>
+						</thead>
+						<tbody>					
+							<tr th:each="store: ${stores}">
+								<td th:text="${store.id}"></td>
+								<td><a th:text="${store.name}" th:href="@{'/stores/' + ${store.id} + '/paintings'}" ></a></td>
+								<td th:text="${store.capacity}"></td>
+								<td>
+									<div class="progress" th:with="var = ${100.0 * store.paintings.size() / store.capacity}">
+										<div class="progress-bar bg-secondary progress-bar-striped progress-bar-animated" th:style="${'width: ' + var + '%'}" th:text="${#numbers.formatDecimal(var,2,1) + ' %'}" ></div>
+									</div>
+								</td>
+								<td>
+									<div class="custom-control custom-switch">
+									  <input type="checkbox" class="custom-control-input" th:id="|checkbox${store.id}|" name="storeIds" th:value="${store.id}"/>
+									  <label class="custom-control-label" th:for="|checkbox${store.id}|"></label>
+									</div>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				
+			</div>
+			<div class="card-footer">
+				<div class="btn-group" role="group" aria-label="Button group with nested dropdown" >
+					<button type="submit" class="btn btn-secondary">Create</button>
+					<button type="submit" th:formaction="@{/stores/delete}" th:formmethod="GET" class="btn btn-danger">Delete</button>
+					<button type="submit" th:formaction="@{/edit}" th:formmethod="GET" class="btn btn-secondary">Edit</button><!-- th:name="employeeIds" th:value="${employeeIds}" -->
+					
+					<div class="btn-group" role="group">
+						<button id="btnGroupDrop1" type="button" class="btn btn-outline-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">FilterBy... </button>
+						<div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+							<input type="submit" th:formaction="@{/}" th:formmethod="GET" class="dropdown-item" th:name="filter" th:value="findByProfession"></input>
+							<input type="submit" th:formaction="@{/}" th:formmethod="GET" class="dropdown-item" th:name="filter" th:value="findByIds"></input>
+							<div class="dropdown-divider"></div>
+							<input type="submit" th:formaction="@{/}" th:formmethod="GET" class="dropdown-item" th:name="filter" th:value="removeFilter"></input>
+						</div>
+					</div>
+				</div>
+				
+			</div>
+		</form>
+	</div>
+</div>
+	
+</body>
+</html>

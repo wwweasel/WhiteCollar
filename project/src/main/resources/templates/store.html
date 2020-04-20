@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments :: head"></head>
+
+<body>
+
+<div class="container-fluid">
+	<div class="card" style="margin-top: 1.5em;">
+		<form action="#" th:action="@{'/stores/' + ${storePaintingsDTO.store.id} + '/paintings/create'}" th:method="GET" th:object="${storePaintingsDTO}">
+			
+			<input type="hidden" th:field="${storePaintingsDTO.store}"/>
+			<!-- <input type="hidden" th:field="${storePaintingsDTO.paintings}"/> -->
+			
+			<div class="card-header">
+				<h6 th:text="${storePaintingsDTO.store.name}"></h6>
+				<div class="progress" th:with="var = ${100.0 * storePaintingsDTO.store.paintings.size() / storePaintingsDTO.store.capacity}">
+					<div class="progress-bar bg-secondary" th:style="${'width: ' + var + '%'}" th:text="${#numbers.formatDecimal(var,2,1) + ' %'}" ></div>
+				</div>
+				<div th:if="${capacityError == 'capacityError'}" class="alert alert-danger" role="alert" th:text="${'Maximum store capacity reached!'}"></div>
+			</div>
+		
+			<div class="card-body">
+				<div th:if="${storePaintingsDTO.paintings.size()} == 0"><!--th:if="${stores == null}"  -->
+				  <p>There are no Paintings yet.</p>
+				</div>
+				<div th:unless="${storePaintingsDTO.paintings.size()} == 0">
+					<table class="table table table-hover">
+						<thead>
+							<tr>
+								<th>ID</th>
+								<th>AuthorName</th>
+								<th>Name</th>
+								<th>Price</th>
+								<th>CreationDateTime</th>
+								<th></th>
+							</tr>
+						</thead>
+						<tbody>					
+							<tr th:each="painting, itemStat : *{paintings}">
+								<td th:text="*{paintings[__${itemStat.index}__].id}" th:field="*{paintings[__${itemStat.index}__].id}"></td>
+								<td th:text="*{paintings[__${itemStat.index}__].authorName}" th:field="*{paintings[__${itemStat.index}__].authorName}"></td>
+								<td th:text="*{paintings[__${itemStat.index}__].name}" th:field="*{paintings[__${itemStat.index}__].name}"></td>
+								<td th:text="*{paintings[__${itemStat.index}__].price}" th:field="*{paintings[__${itemStat.index}__].price}"></td>
+								<td th:with="date=*{paintings[__${itemStat.index}__].creationDateTime}" th:text="${#temporals.format(date, 'dd/MM/yyyy HH:mm')}" th:field="*{paintings[__${itemStat.index}__].creationDateTime}"></td>
+								<td>
+									<div class="custom-control custom-switch">
+									  <input type="checkbox" class="custom-control-input" th:id="|checkbox*{paintings[__${itemStat.index}__].id}|" name="paintingIds" th:value="*{paintings[__${itemStat.index}__].id}"/>
+									  <label class="custom-control-label" th:for="|checkbox*{paintings[__${itemStat.index}__].id}|"></label>
+									</div>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				
+			</div>
+			<div class="card-footer">
+				<div class="btn-group" role="group" aria-label="Button group with nested dropdown" >
+					<button type="submit" class="btn btn-secondary">Create</button>
+					<button type="submit" th:formaction="@{'/stores/' + ${storePaintingsDTO.store.id} + '/paintings/delete'}" th:formmethod="GET" class="btn btn-danger">Delete</button>
+					<button type="submit" th:formaction="@{/edit}" th:formmethod="GET" class="btn btn-secondary">Edit</button><!-- th:name="employeeIds" th:value="${employeeIds}" -->
+					
+					<div class="btn-group" role="group">
+						<button id="btnGroupDrop1" type="button" class="btn btn-outline-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">FilterBy... </button>
+						<div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+							<input type="submit" th:formaction="@{/}" th:formmethod="GET" class="dropdown-item" th:name="filter" th:value="findByProfession"></input>
+							<input type="submit" th:formaction="@{/}" th:formmethod="GET" class="dropdown-item" th:name="filter" th:value="findByIds"></input>
+							<div class="dropdown-divider"></div>
+							<input type="submit" th:formaction="@{/}" th:formmethod="GET" class="dropdown-item" th:name="filter" th:value="removeFilter"></input>
+						</div>
+					</div>
+				</div>
+				
+			</div>
+		</form>
+	</div>
+</div>
+	
+</body>
+</html>

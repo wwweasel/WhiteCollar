@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments :: head"></head>
+
+<body>
+
+	<div class="container-fluid">
+		
+		<div class="col-6">			
+			<div class="card" style="margin-top: 1.5em;">
+				<form action="#" th:object="${store}">
+				
+					<div class="card-header">
+						<h6 th:text="${'Create new Store'}">Create Store</h6>
+					</div>
+						
+					<div class="card-body">
+						<div class="form-grp row">
+							<label for="name" class="col-md-12 col-lg-3 col-form-label">Name:</label>
+							<div class="col-md-12 col-lg-9">
+								<input class="form-control" th:field="${store.name}" placeholder="name">
+								<div th:errors="${store.name}" class="alert alert-danger" role="alert"></div>
+							</div>
+						</div>
+						<div class="form-grp row">
+							<label for="surname" class="col-md-12 col-lg-3 col-form-label">Capacity:</label>
+							<div class="col-md-12 col-lg-9">
+								<input class="form-control" th:field="${store.capacity}" placeholder="Surname">
+								<div th:errors="${store.capacity}" class="alert alert-danger" role="alert"></div>
+							</div>
+						</div>
+							  
+						
+						<div class="form-grp">
+							<label class="col-md-2 col-form-label"></label>
+						</div>
+						
+						<button type="submit" formaction="/stores/" formmethod="get" class="btn btn-secondary">cancel</button>
+						<button type="submit" formaction="/stores/" formmethod="post" class="btn btn-secondary float-right">create Store</button>
+							
+					</div>
+					
+				</form>
+			</div>
+		</div>
+	</div>
+	
+</body>
+</html>

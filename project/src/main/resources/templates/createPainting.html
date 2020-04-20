@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments :: head"></head>
+
+<body>
+
+	<div class="container-fluid">
+		
+		<div class="col-6">			
+			<div class="card" style="margin-top: 1.5em;">
+				<form action="#" th:object="${storePaintingDTO}">
+				
+					<input type="hidden" th:field="${storePaintingDTO.store}" />
+				
+					<div class="card-header">
+						<h6 th:text="${'Create new Painting'}">Create Painting</h6>
+					</div>
+						
+					<div class="card-body">
+						<div class="form-grp row">
+							<label for="name" class="col-md-12 col-lg-3 col-form-label">AuthorName:</label>
+							<div class="col-md-12 col-lg-9">
+								<input class="form-control" th:field="${storePaintingDTO.painting.authorName}" placeholder="name">
+								<div th:errors="${storePaintingDTO.painting.authorName}" class="alert alert-danger" role="alert"></div>
+							</div>
+						</div>
+						<div class="form-grp row">
+							<label for="surname" class="col-md-12 col-lg-3 col-form-label">Name:</label>
+							<div class="col-md-12 col-lg-9">
+								<input class="form-control" th:field="${storePaintingDTO.painting.name}" placeholder="Surname">
+								<div th:errors="${storePaintingDTO.painting.name}" class="alert alert-danger" role="alert"></div>
+							</div>
+						</div>
+						<div class="form-grp row">
+							<label for="surname" class="col-md-12 col-lg-3 col-form-label">Price:</label>
+							<div class="col-md-12 col-lg-9">
+								<input class="form-control" th:field="${storePaintingDTO.painting.price}" placeholder="Surname">
+								<div th:errors="${storePaintingDTO.painting.price}" class="alert alert-danger" role="alert"></div>
+							</div>
+						</div>
+						
+						<div class="form-grp">
+							<label class="col-md-2 col-form-label"></label>
+						</div>
+						
+						<button type="submit" th:formaction="@{'/stores/' + ${storePaintingDTO.store.id} + '/paintings'}" th:formmethod="GET" class="btn btn-secondary">cancel</button>
+						<button type="submit" th:formaction="@{'/stores/' + ${storePaintingDTO.store.id} + '/paintings'}" th:formmethod="POST" class="btn btn-secondary float-right">create</button>
+							
+					</div>
+					
+				</form>
+			</div>
+		</div>
+	</div>
+	
+</body>
+</html>
