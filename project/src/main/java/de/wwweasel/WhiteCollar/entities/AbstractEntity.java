@@ -1,4 +1,4 @@
-package de.wwweasel.WhiteCollar;
+package de.wwweasel.WhiteCollar.entities;
 
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;

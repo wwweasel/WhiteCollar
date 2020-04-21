@@ -1,4 +1,4 @@
-package de.wwweasel.WhiteCollar;
+package de.wwweasel.WhiteCollar.entities;
 
 
 import java.time.LocalDateTime;
@@ -9,6 +9,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.PostLoad;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -26,7 +27,7 @@ public class Painting{
 	@Column(name = "creationDateTime", columnDefinition = "TIMESTAMP")
 	private LocalDateTime creationDateTime;
 		
-	@JsonIgnore
+	@JsonIgnore//This avoids the recursion exception
 	@ManyToOne
 	private Store store;
 	
@@ -111,10 +112,6 @@ public class Painting{
 		} else if (!id.equals(other.id))
 			return false;
 		return true;
-	}
-	
-	
-	
-	
+	}	
 	
 }

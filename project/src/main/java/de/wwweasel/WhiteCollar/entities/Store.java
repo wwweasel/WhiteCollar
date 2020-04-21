@@ -1,4 +1,4 @@
-package de.wwweasel.WhiteCollar;
+package de.wwweasel.WhiteCollar.entities;
 
 import java.util.ArrayList;
 import java.util.List;

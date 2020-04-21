@@ -1,4 +1,7 @@
-package de.wwweasel.WhiteCollar;
+package de.wwweasel.WhiteCollar.dto;
+
+import de.wwweasel.WhiteCollar.entities.Painting;
+import de.wwweasel.WhiteCollar.entities.Store;
 
 public class StorePaintingDTO {
 	

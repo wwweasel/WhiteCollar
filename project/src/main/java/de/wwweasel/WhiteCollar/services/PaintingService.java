@@ -1,4 +1,4 @@
-package de.wwweasel.WhiteCollar;
+package de.wwweasel.WhiteCollar.services;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -6,6 +6,9 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import de.wwweasel.WhiteCollar.entities.Painting;
+import de.wwweasel.WhiteCollar.repos.PaintingRepo;
 
 @Service
 public class PaintingService {

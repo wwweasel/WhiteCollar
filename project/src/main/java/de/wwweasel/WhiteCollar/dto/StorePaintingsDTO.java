@@ -1,7 +1,10 @@
-package de.wwweasel.WhiteCollar;
+package de.wwweasel.WhiteCollar.dto;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import de.wwweasel.WhiteCollar.entities.Painting;
+import de.wwweasel.WhiteCollar.entities.Store;
 
 public class StorePaintingsDTO {
 	
