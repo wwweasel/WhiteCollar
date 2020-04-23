@@ -4,6 +4,8 @@
 
 <body>
 
+<div th:replace="fragments :: navBar"></div>
+
 <div class="container-fluid">
 	<div class="card" style="margin-top: 1.5em;">
 		<form action="#" th:action="@{'/stores/' + ${storePaintingsDTO.store.id} + '/paintings/create'}" th:method="GET" th:object="${storePaintingsDTO}">

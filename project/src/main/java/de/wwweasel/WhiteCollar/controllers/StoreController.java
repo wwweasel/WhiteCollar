@@ -3,9 +3,12 @@ package de.wwweasel.WhiteCollar.controllers;
 import java.util.List;
 import java.util.Optional;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -64,9 +67,13 @@ public class StoreController {
 	}
 	
 	@RequestMapping(method=RequestMethod.POST,value="/")
-	public String create(@ModelAttribute Store store) {
-		storeService.save(store);
-		return "redirect:/stores/";
+	public String create(@ModelAttribute @Valid Store store, Errors errors) {
+		if(errors.hasErrors()) {
+			return "/create";
+		}else {
+			storeService.save(store);
+			return "redirect:/stores/";
+		}
 	}
 	
 	@RequestMapping(method=RequestMethod.GET,value="/delete")
@@ -79,34 +86,51 @@ public class StoreController {
 	
 	// PAINTINGS
 	
+//	@RequestMapping(method=RequestMethod.GET,value="/{id}/paintings/create")
+//	public ModelAndView createPainting(@PathVariable Integer id) {
+//		ModelAndView mv = new ModelAndView();
+//		Store store = storeService.findById(id);
+//		
+//		if(store.getPaintings().size()==store.getCapacity()) {
+//			
+//			mv.addObject("capacityError","capacityError");
+//			mv.setViewName("redirect:/stores/"+ id +"/paintings");
+//			return mv;
+//		}else {
+//			StorePaintingDTO dto = new StorePaintingDTO();
+//			dto.setStore(store);
+//			dto.setPainting(new Painting());
+//			
+//			mv.addObject("storePaintingDTO", dto);
+//			mv.setViewName("createPainting");
+//			return mv;
+//		}
+//	}
+	
 	@RequestMapping(method=RequestMethod.GET,value="/{id}/paintings/create")
-	public ModelAndView createPainting(@PathVariable Integer id) {
-		ModelAndView mv = new ModelAndView();
+	public String createPainting(@PathVariable Integer id, Model model) {
+		StorePaintingDTO dto = new StorePaintingDTO();
 		Store store = storeService.findById(id);
+		dto.setStore(store);
+		dto.setPainting(new Painting());
 		
-		if(store.getPaintings().size()==store.getCapacity()) {
-			
-			mv.addObject("capacityError","capacityError");
-			mv.setViewName("redirect:/stores/"+ id +"/paintings");
-			return mv;
-		}else {
-			StorePaintingDTO dto = new StorePaintingDTO();
-			dto.setStore(store);
-			dto.setPainting(new Painting());
-			
-			mv.addObject("storePaintingDTO", dto);
-			mv.setViewName("createPainting");
-			return mv;
-		}
+		model.addAttribute(dto);
+		return "createPainting";
 	}
 	
+	
 	@RequestMapping(method=RequestMethod.POST,value="/{id}/paintings")
-	public String createPainting(@ModelAttribute StorePaintingDTO dto, @PathVariable Integer id) {
-		Store store = dto.getStore();
-		Painting painting = dto.getPainting();
-		painting.setStore(store);
-		paintingService.save(painting);
-		return "redirect:/stores/"+ id +"/paintings";
+	public String createPainting(@ModelAttribute @Valid StorePaintingDTO dto, Errors errors, @PathVariable Integer id) {
+		if(errors.hasErrors()) {
+			return "createPainting";
+		}else {
+			Store store = dto.getStore();
+			Painting painting = dto.getPainting();
+			painting.setStore(store);
+			paintingService.save(painting);
+			return "redirect:/stores/"+ id +"/paintings";
+		}
+		
 	}
 	
 	@RequestMapping(method=RequestMethod.GET,value="/{id}/paintings/delete")

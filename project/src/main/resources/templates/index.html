@@ -4,12 +4,14 @@
 
 <body>
 
+<div th:replace="fragments :: navBar"></div>
+
 <div class="container-fluid">
 	<div class="card" style="margin-top: 1.5em;">
 		<form action="#" th:action="@{/stores/create}" th:method="GET" th:object="${stores}">
 			
 			<div class="card-header">
-				<h6>WhiteCollar</h6>
+				<h6>Stores</h6>
 			</div>
 		
 			<div class="card-body">

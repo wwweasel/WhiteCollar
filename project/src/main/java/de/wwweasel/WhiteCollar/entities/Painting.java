@@ -9,7 +9,10 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
-import javax.persistence.PostLoad;
+import javax.persistence.PrePersist;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -20,8 +23,15 @@ public class Painting{
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Integer id;
-	private String authorName;
+	
+	@Column(name="author_name", columnDefinition="varchar(30) default 'Anonymous'", nullable = false)
+	private String authorName = "Anonymous";
+	
+	@NotBlank(message="required")
 	private String name;
+	
+	@NotNull(message="required")
+	@Min(value = 0, message="no negative values please")
 	private int price;
 	
 	@Column(name = "creationDateTime", columnDefinition = "TIMESTAMP")
@@ -82,6 +92,14 @@ public class Painting{
 	public void setCreationDateTime(LocalDateTime creationDateTime) {
 		this.creationDateTime = creationDateTime;
 	}
+	
+	@PrePersist
+	public void prePersist(){
+		this.creationDateTime = LocalDateTime.now();
+	}
+	
+	
+	
 
 	@Override
 	public String toString() {

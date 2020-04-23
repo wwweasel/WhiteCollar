@@ -1,11 +1,18 @@
 package de.wwweasel.WhiteCollar.dto;
 
+
+import javax.validation.Valid;
+
 import de.wwweasel.WhiteCollar.entities.Painting;
 import de.wwweasel.WhiteCollar.entities.Store;
 
+
 public class StorePaintingDTO {
 	
+	@Valid
 	private Store store;
+	
+	@Valid
 	private Painting painting;
 	
 	

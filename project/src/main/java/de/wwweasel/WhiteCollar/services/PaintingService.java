@@ -1,24 +1,22 @@
 package de.wwweasel.WhiteCollar.services;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import de.wwweasel.WhiteCollar.entities.Painting;
 import de.wwweasel.WhiteCollar.repos.PaintingRepo;
-
+ 
 @Service
 public class PaintingService {
 	@Autowired
 	PaintingRepo repo;
 	
-	public Painting save(Painting painting) {
-		LocalDateTime localDateTime = LocalDateTime.now();
-		painting.setCreationDateTime(localDateTime);
-		return repo.save(painting);
+	public void save(Painting painting){
+		repo.save(painting);
 	}
 	
 	public void delete(Integer id) {

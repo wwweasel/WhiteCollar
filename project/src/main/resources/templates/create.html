@@ -3,6 +3,8 @@
 <head th:replace="fragments :: head"></head>
 
 <body>
+	
+	<div th:replace="fragments :: navBar"></div>
 
 	<div class="container-fluid">
 		
@@ -25,7 +27,7 @@
 						<div class="form-grp row">
 							<label for="surname" class="col-md-12 col-lg-3 col-form-label">Capacity:</label>
 							<div class="col-md-12 col-lg-9">
-								<input class="form-control" th:field="${store.capacity}" placeholder="Surname">
+								<input class="form-control" th:field="${store.capacity}" placeholder="10">
 								<div th:errors="${store.capacity}" class="alert alert-danger" role="alert"></div>
 							</div>
 						</div>
