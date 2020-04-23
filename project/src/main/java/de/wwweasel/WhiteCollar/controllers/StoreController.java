@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import de.wwweasel.WhiteCollar.Exceptions.ApiRequestException;
 import de.wwweasel.WhiteCollar.dto.StorePaintingDTO;
 import de.wwweasel.WhiteCollar.dto.StorePaintingsDTO;
 import de.wwweasel.WhiteCollar.entities.Painting;
@@ -86,37 +87,42 @@ public class StoreController {
 	
 	// PAINTINGS
 	
-//	@RequestMapping(method=RequestMethod.GET,value="/{id}/paintings/create")
-//	public ModelAndView createPainting(@PathVariable Integer id) {
-//		ModelAndView mv = new ModelAndView();
-//		Store store = storeService.findById(id);
-//		
-//		if(store.getPaintings().size()==store.getCapacity()) {
-//			
-//			mv.addObject("capacityError","capacityError");
-//			mv.setViewName("redirect:/stores/"+ id +"/paintings");
-//			return mv;
-//		}else {
-//			StorePaintingDTO dto = new StorePaintingDTO();
-//			dto.setStore(store);
-//			dto.setPainting(new Painting());
-//			
-//			mv.addObject("storePaintingDTO", dto);
-//			mv.setViewName("createPainting");
-//			return mv;
-//		}
-//	}
-	
 	@RequestMapping(method=RequestMethod.GET,value="/{id}/paintings/create")
-	public String createPainting(@PathVariable Integer id, Model model) {
-		StorePaintingDTO dto = new StorePaintingDTO();
+	public ModelAndView createPainting(@PathVariable Integer id) {
+		ModelAndView mv = new ModelAndView();
 		Store store = storeService.findById(id);
-		dto.setStore(store);
-		dto.setPainting(new Painting());
 		
-		model.addAttribute(dto);
-		return "createPainting";
+		if(store.getPaintings().size()==store.getCapacity()) {
+			//throw new ApiRequestException("StoreCapacity full!");
+			mv.addObject("capacityError","capacityError");
+			mv.setViewName("redirect:/stores/"+ id +"/paintings");
+			return mv;
+			
+		}else {
+			StorePaintingDTO dto = new StorePaintingDTO();
+			dto.setStore(store);
+			dto.setPainting(new Painting());
+			
+			mv.addObject("storePaintingDTO", dto);
+			mv.setViewName("createPainting");
+			return mv;
+		}
 	}
+	
+	
+	
+	
+	
+//	@RequestMapping(method=RequestMethod.GET,value="/{id}/paintings/create")
+//	public String createPainting(@PathVariable Integer id, Model model) {
+//		StorePaintingDTO dto = new StorePaintingDTO();
+//		Store store = storeService.findById(id);
+//		dto.setStore(store);
+//		dto.setPainting(new Painting());
+//		
+//		model.addAttribute(dto);
+//		return "createPainting";
+//	}
 	
 	
 	@RequestMapping(method=RequestMethod.POST,value="/{id}/paintings")
