@@ -25,7 +25,6 @@ import de.wwweasel.WhiteCollar.entities.Store;
 import de.wwweasel.WhiteCollar.services.PaintingService;
 import de.wwweasel.WhiteCollar.services.StoreService;
 
-
 @Controller
 @RequestMapping("/stores")
 public class StoreController {
@@ -108,21 +107,6 @@ public class StoreController {
 			return mv;
 		}
 	}
-	
-	
-	
-	
-	
-//	@RequestMapping(method=RequestMethod.GET,value="/{id}/paintings/create")
-//	public String createPainting(@PathVariable Integer id, Model model) {
-//		StorePaintingDTO dto = new StorePaintingDTO();
-//		Store store = storeService.findById(id);
-//		dto.setStore(store);
-//		dto.setPainting(new Painting());
-//		
-//		model.addAttribute(dto);
-//		return "createPainting";
-//	}
 	
 	
 	@RequestMapping(method=RequestMethod.POST,value="/{id}/paintings")
