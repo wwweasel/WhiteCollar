@@ -1,31 +1,36 @@
 <template>
-  <div>
+  <div class="tableHead" style="margin-top: 1.5em;">
 
     <b-card header-tag="header" footer-tag="footer">
       <!-- Header -->
       <template v-slot:header>
-          <b-row>
-            <b-col class="col-12">
-
-              <b-row>
-                <b-col class="col-2" align-h="start">
-                  <h6>Stores</h6>
-                </b-col>
-                <b-col class="col-10" align-h="end">
+        <b-row>
+          <b-col class="col-12">
+            
+            <b-row>
+              <b-col class="col-3">
+                <div class="text-left">
+                  <h5>Stores</h5>
+                </div>
+              </b-col>
+              <b-col class="col-9">
+                <div class="text-right">
                   <b-button-group size="sm">
                     <b-button id="createButton" variant="primary" @click="showModal">Create</b-button>
                     <b-button id="dangerButton" variant="danger" @click="del">Delete</b-button>
                     <b-button id="isolateButton" variant="outline-primary" @click="isolate">Isolate</b-button>
                   </b-button-group>
-                </b-col>
-              </b-row>
+                </div>
+              </b-col>
+            </b-row>
+
+          </b-col>
+        </b-row>
               
-            </b-col>
-          </b-row>
       </template>
 
       <!-- Body/Table -->
-      <b-table sticky-header hover :head-variant="headVariant" ref="table" selectable :select-mode="selectMode" selected-variant="primary" :items="getItems" :fieldsComputed="getFields" @row-selected="onRowSelected" responsive="sm" :current-page="currentPage" :per-page="perPage"><!---->
+      <b-table sticky-header hover :head-variant="headVariant" ref="table" id="TableB" :busy="tableBusy" selectable :select-mode="selectMode" selected-variant="primary" :items="getItems" :fieldsComputed="getFields" @row-selected="onRowSelected" responsive="sm" :current-page="currentPage" :per-page="perPage"><!---->
      
         <!-- This Block changes the visibility of the selected row -->
         <template v-slot:cell(selected)="{ rowSelected }">
@@ -39,10 +44,10 @@
           </template>
         </template>
 
-        <!--  -->
+        <!--"'nameInput'+row.item.id"  -->
         <template v-slot:cell(name)="row">
           <b-form-input v-if="row.item.actions.buttonToggle" v-bind:id="'nameInput'+row.item.id" v-model="row.item.name" placeholder="enter the Store's name here" size="sm">{{row.item.name}}</b-form-input><!--disabled-->
-          <b-link v-else href="/">{{row.item.name}}</b-link>
+          <router-link v-else v-bind:to="'/store/'+row.item.id">{{row.item.name}}</router-link>
         </template>
 
         <!--  -->
@@ -108,11 +113,13 @@ export default {
         perPage: 5,
         pageOptions: [5, 10, 15, 20, 50],
         ids: [],
+
+        tableBusy: false
            
       }
     },
     methods: {
-        ...mapActions(['toggleButton','loadItems','loadFields','addStore']),
+        ...mapActions(['toggleButton','loadItems','loadFields','addStore','loadPaintings','editStore']),
       onRowSelected(items) {
         this.selected = items;
         this.ids = [];
@@ -122,20 +129,36 @@ export default {
         //console.log(this.ids);
       },
       selectAllRows() {
-        this.$refs.selectableTable.selectAllRows()
+        this.$refs.table.selectAllRows()
       },
       clearSelected() {
-        this.$refs.selectableTable.clearSelected()
+        this.$refs.table.clearSelected()
       },
       toggleButtons(event){
-        this.toggleButton(event.target.id);
+        
+        if( this.getButtonstate(event.target.id) ){ // Vuex
+            
+            const editStoreFrag = {
+              id: event.target.id,
+              name: document.querySelector('#nameInput'+event.target.id).value,
+              capacity: document.querySelector('#capacityInput'+event.target.id).value,
+            }
+          this.editStore(editStoreFrag);
+          
+          this.tableBusy = true
+          this.$refs.table.refresh()
+          this.tableBusy = false
+        }
+
+        this.toggleButton(event.target.id); // Vuex
       },
       del(){
         console.log(this.ids);
         //this.items = this.items.filter( input => input.id!==id);
       },
       isolate(){
-        console.log(this.ids);
+        console.log(this.getItem(3).name);
+        console.log(this.getItem(3).capacity);
       },
       createStore(newStore){
         this.addStore(newStore);
@@ -146,12 +169,16 @@ export default {
     
     },
     computed: {
-        ...mapGetters(['getItems','getFields', 'getItemsCount']),
+        ...mapGetters(['getItems','getFields', 'getItemsCount','getItem','getButtonstate']),
     },
     created(){
-        console.log("CREATED:");
+        //console.log("CREATED:");
         this.loadFields();
         this.loadItems();
+        this.loadPaintings();
+    },
+    beforeDestroy(){
+      console.log("Before destruction from TableB");
     }
 }
 </script>

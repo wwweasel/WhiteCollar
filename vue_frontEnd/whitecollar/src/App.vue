@@ -1,16 +1,22 @@
 <template>
   <div id="app">
-    <TableB></TableB>
+    
+      <NavBar></NavBar>
+      <b-row align-h="center">
+        <b-col class="col-10">
+          <router-view></router-view>
+        </b-col>
+      </b-row>
+
   </div>
 </template>
 
 <script>
-import TableB from "./components/TableB.vue";
-
+import NavBar from "./components/NavBar.vue";
 export default {
   name: "App",
   components: {
-    TableB
+    NavBar
   }
 };
 </script>

@@ -15,7 +15,7 @@ import de.wwweasel.WhiteCollar.entities.Store;
 import de.wwweasel.WhiteCollar.services.PaintingService;
 import de.wwweasel.WhiteCollar.services.StoreService;
 
-//@RestController
+@RestController
 @RequestMapping("/stores")
 public class StoreRestController {
 	
