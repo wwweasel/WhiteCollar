@@ -1,9 +1,9 @@
 <template>
     <div>
         <b-form inline class="d-flex justify-content-between" @submit="createPainting"> 
-            <b-input v-model="newPainting.authorName" id="authorname" class="flex-fill" placeholder="Authorname"></b-input>                                
-            <b-input v-model="newPainting.name" id="name" class="flex-fill" placeholder="Name"></b-input>
-            <b-input v-model="newPainting.price" type="number" id="price" class="flex-fill" placeholder="Price"></b-input>
+            <b-input v-model="authorName" id="authorname" class="flex-fill" placeholder="Authorname"></b-input>                                
+            <b-input v-model="name" id="name" class="flex-fill" placeholder="Name"></b-input>
+            <b-input v-model="price" type="number" id="price" class="flex-fill" placeholder="Price"></b-input>
             <b-button type="submit" id="save" class="flex-fill" variant="secondary">Save</b-button>
         </b-form>
     </div>
@@ -13,51 +13,51 @@
 import { mapGetters, mapActions } from 'vuex';
 export default {
     name: 'AddPainting',
-    props:{
-        storeId:{
-            type: Number,
+    computed: {
+        ...mapGetters(['getFormPainting']),
+        authorName:{
+            get(){
+                return this.getFormPainting.authorName;
+            },
+            set(value){
+                let clone = { ...this.getFormPainting };
+                clone.authorName = value;
+                this.setFormPainting(clone);
+            }
         },
-        paintingId:{
-            type: Number,
-            default: null
+        name:{
+            get(){
+                return this.getFormPainting.name;
+            },
+            set(value){
+                let clone = { ...this.getFormPainting };
+                clone.name = value;
+                this.setFormPainting(clone);
+            }
         },
-        paintingName:{
-            type: String,
-            default: ''
+        price:{
+            get(){
+                return this.getFormPainting.price;
+            },
+            set(value){
+                let clone = { ...this.getFormPainting };
+                clone.price = value;
+                this.setFormPainting(clone);
+            }
         },
-        paintingAuthorName:{
-            type: String,
-            default: 'anonymous'
-        },
-        paintingPrice:{
-            type: Number,
-            default: 0
-        }
     },
     data(){
     return{
-        newPainting: { 
-            id: this.paintingId,
-            storeId: this.storeId,
-            authorName: this.paintingAuthorName,
-            name: this.paintingName,
-            price: this.paintingPrice
-        }
+        
     }
     },
     methods: {
-        ...mapActions(['addPainting']),
+        ...mapActions(['addPainting','setFormPainting']),
         createPainting(event){
             event.preventDefault();
-            this.addPainting({...this.newPainting});
+            this.addPainting( this.getFormPainting );
             this.$emit('createPainting');// So that the parent(Store.vue) can collapse the form after createion. 
         },
     },
-    computed: {
-        ...mapGetters(['getPainting']),
-    },
-    beforeDestroy(){
-      console.log("Before destruction from Store");
-    }
 }
 </script>

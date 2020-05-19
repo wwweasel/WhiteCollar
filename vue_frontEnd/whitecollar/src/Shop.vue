@@ -2,7 +2,7 @@
 
     <div style="margin-top: 1.5em;">
 
-        <b-card no-body ><!--:header="getItem($route.params.storeId).name + ' Paintings'"--><!--header-tag="header"-->
+        <b-card no-body ><!--:header="getShop($route.params.shopId).name + ' Paintings'"--><!--header-tag="header"-->
 
             <template v-slot:header>
                 <b-row>
@@ -11,11 +11,11 @@
                         <b-row>
                             <b-col class="col-4">
                                 <div class="text-left">
-                                    <h5>{{getItem(storeId).name + ' / Paintings'}}</h5><!---->
+                                    <h5>{{getShop(shopId).name + ' / Paintings'}}</h5><!---->
                                 </div>
                             </b-col>
                             <b-col class="col-8">
-                                <b-progress :value="getPaintingsByStoreId($route.params.storeId).length" :max="getItem($route.params.storeId).capacity" show-progress variant="secondary"></b-progress>
+                                <b-progress :value="getPaintings.length" :max="getShop($route.params.shopId).capacity" show-progress variant="secondary"></b-progress>
                             </b-col>
                         </b-row>
                     </b-col>
@@ -30,7 +30,7 @@
                     
                     <!--v-bind:class="{ 'active' : isSelected(0) }" v-on:click="selected = 0" v-on:mouseleave="mouseleave(painting.id)"-->
                     
-                    <div v-for="(painting,index) in getPaintingsByStoreId(storeId)" v-bind:key="painting.id">
+                    <div v-for="(painting,index) in getPaintings" v-bind:key="painting.id">
                             
                         <b-list-group-item class="flex-column align-items-start" :variant="index%2==0 ? 'secondary' : 'default'">
                             <b-media>
@@ -41,7 +41,7 @@
                                 <div class="d-flex w-100 justify-content-between">
                                     <h3 class="mb-1"><b-badge variant="secondary">{{painting.name}}</b-badge></h3>
                                     
-                                    <b-button :id="'icon'+painting.id" v-b-toggle="'itemCollapse'+painting.id" size="sm" variant="outline-secondary" v-b-popover.hover.left="'Edit Paining'"><b-icon icon="pencil"></b-icon></b-button>
+                                    <b-button @click="editPainting(painting.id)" :id="'icon'+painting.id" v-b-toggle="'itemCollapse'+painting.id" size="sm" variant="outline-secondary" v-b-popover.hover.left="'Edit Paining'"><b-icon icon="pencil"></b-icon></b-button>
                                 </div>
                                 
                                 <div class="d-flex w-100 justify-content-start">
@@ -56,7 +56,7 @@
                             <!-- EDIT -->
                             </b-media>
                             <b-collapse :id="'itemCollapse'+painting.id">
-                                <AddPainting v-bind:storeId="Number(storeId)" v-bind:paintingId="Number(painting.id)" v-bind:paintingName="painting.name" v-bind:paintingAuthorName="painting.authorName" v-bind:paintingPrice="Number(painting.price)" @createPainting="close(painting.id)"></AddPainting>
+                                <AddPainting @createPainting="close(painting.id)"></AddPainting>
                             </b-collapse>
                         </b-list-group-item>
 
@@ -64,8 +64,8 @@
 
                     <!-- CREATE -->
                     <b-list-group-item >
-                        <b-collapse v-model="createToggled">
-                            <AddPainting v-bind:storeId="Number(storeId)" v-bind:paintingId="null" @createPainting="createCollapse"></AddPainting>
+                        <b-collapse v-model="createToggled"><!-- This will be toggled by the Create Button in the Footer -->
+                            <AddPainting @createPainting="createCollapse"></AddPainting>
                         </b-collapse>
                     </b-list-group-item>
 
@@ -87,7 +87,6 @@
                         <form action="http://localhost:8080/#createSpy">
                             <b-button type="submit" @click="createCollapse" id="createItem" ref="createItem" :variant="createVariant">Create</b-button>
                         </form>
-                        <!--<b-list-group-item id="createItem" ref="createItem" href="#createSpy" @click="createCollapse" :variant="createVariant">Create</b-list-group-item><-->
                     </b-list-group>
                 </b-nav>
             </template>
@@ -101,36 +100,40 @@
 import { mapGetters, mapActions } from 'vuex';
 import AddPainting from '@/components/AddPainting.vue';
 export default {
-    name: 'Store',
+    name: 'Shop',
     components: {
       AddPainting
     },
     props:{
-        storeId:{
+        shopId:{
             type: String,
         },
     },
     data() {
-      return {
-        createCollapseVis: false,
-        
+      return {        
         createToggled: false,
         createVariant: 'primary',
-
       }
     },
     methods: {
-        ...mapActions(['deleteSelectedPainting']),
+        ...mapActions(['loadPaintings','deleteSelectedPainting','setFormPainting']),
         createCollapse(){
             this.createToggled = !this.createToggled;
             if(this.createToggled){
                 this.createVariant = 'danger';
                 this.$refs.createItem.innerHTML = 'Cancel';
-                //console.log(this.$refs.createItem);
+                
+                // Pass a clean Painting to the Form
+                this.setFormPainting( {id: null, shopId: Number(this.shopId), authorName: 'Anonymous', name: '', price: 0} );
+
             }else{
                 this.createVariant = 'primary';
                 this.$refs.createItem.innerHTML = 'Create';
             }
+        },
+        editPainting(paintingId){
+            // Pass the current Painting to the Form
+            this.setFormPainting( this.getPainting(paintingId) );
         },
         deletePainting(paintingId){
             //console.log(paintingId);
@@ -141,10 +144,11 @@ export default {
         }
     },
     computed: {
-        ...mapGetters(['getPaintingsByStoreId','getItem','getPainting']),
+        ...mapGetters(['getPaintings','getPainting','getShop']),
     },
-    beforeDestroy(){
-      console.log("Before destruction from Store");
+    created(){
+      this.loadPaintings(Number(this.shopId));
+      //console.log('shopId: ' + this.shopId);
     }
     
 }

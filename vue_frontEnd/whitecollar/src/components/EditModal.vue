@@ -4,10 +4,10 @@
 
           <form ref="form" @submit.stop.prevent="handleSubmit">
             <b-form-group :state="nameState" label="Name" label-for="name-input" invalid-feedback="Name is required" label-cols-sm="2">
-              <b-form-input id="name-input" v-model="name" :state="nameState" required ></b-form-input>
+              <b-form-input id="name-input" v-model="name" :state="nameState" required ></b-form-input><!--:placeholder="namePlaceholder"-->
             </b-form-group>
             <b-form-group :state="capacityState" label="Capacity" label-for="capacity-input" invalid-feedback="Capacity is required" label-cols-sm="2">
-              <b-form-input id="capacity-input" v-model="capacity" :state="capacityState" required ></b-form-input>
+              <b-form-input id="capacity-input" type="number" v-model="capacity" :state="capacityState" required ></b-form-input>
             </b-form-group>
           </form>
 
@@ -16,29 +16,47 @@
 </template>
 
 <script>
+  import { mapGetters, mapActions } from 'vuex';
   export default {
     name: "EditModal",
     computed: {
+      ...mapGetters(['getFormShop']),
       title(){
-        if(this.storeid){
-          return 'Edit Store with id: ' + this.storeid
+        if(this.getFormShop.id){
+          return 'Edit Shop with id: ' + this.getFormShop.id
         }else{
-          return 'Create a new Store'
+          return 'Create a new Shop'
         }
-        
-      }
+      },
+      name:{
+        get(){
+          return this.getFormShop.name;
+        },
+        set(value){
+          let clone = { ...this.getFormShop };
+          clone.name = value;
+          this.setFormShop(clone);
+        }
+      },
+      capacity:{
+        get(){
+          return this.getFormShop.capacity;
+        },
+        set(value){
+          let clone = { ...this.getFormShop };
+          clone.capacity = value;
+          this.setFormShop(clone);
+        }
+      },
     },
     data() {
-      return {        
-        name: '',
+      return {
         nameState: null,
-        submittedNames: [],
-
-        capacity: '',
         capacityState: null,
       }
     },
     methods: {
+      ...mapActions(['addShop','setFormShop']),
       checkFormValidity() {
         const valid = this.$refs.form.checkValidity()
         this.nameState = valid
@@ -46,9 +64,10 @@
         return valid
       },
       resetModal() {
-        this.name = ''
+        //this.newShop.id = null,
+        //this.newShop.name = ''
         this.nameState = null
-        this.capacity = ''
+        //this.newShop.capacity = ''
         this.capacityState = null
       },
       handleOk(bvModalEvt) {
@@ -62,20 +81,17 @@
         if (!this.checkFormValidity()) {
           return
         }
-        // Push the name to submitted names
-        const newStore={
-          id: null,
-          name: this.name,
-          capacity: this.capacity,
-          load: 40
-        }
+        
+        // console.log("Before: ");
+        // console.log(this.getFormShop.id);
+        // console.log(this.getFormShop.name);
+        // console.log(this.getFormShop.capacity);    
+        this.addShop(this.getFormShop);
         // Hide the modal manually
         this.resetModal();
         this.$nextTick(() => {
           this.$bvModal.hide('modal')
         })
-
-        this.$emit('emit-store', newStore);
       }
     }
   }

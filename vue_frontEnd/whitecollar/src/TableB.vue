@@ -10,15 +10,13 @@
             <b-row>
               <b-col class="col-3">
                 <div class="text-left">
-                  <h5>Stores</h5>
+                  <h5>Shops</h5>
                 </div>
               </b-col>
               <b-col class="col-9">
                 <div class="text-right">
                   <b-button-group size="sm">
-                    <b-button id="createButton" variant="primary" @click="showModal">Create</b-button>
-                    <b-button id="dangerButton" variant="danger" @click="del">Delete</b-button>
-                    <b-button id="isolateButton" variant="outline-primary" @click="isolate">Isolate</b-button>
+                    <b-button id="createButton" variant="primary" @click="showModal(null)">Create</b-button>
                   </b-button-group>
                 </div>
               </b-col>
@@ -30,9 +28,9 @@
       </template>
 
       <!-- Body/Table -->
-      <b-table sticky-header hover :head-variant="headVariant" ref="table" id="TableB" :busy="tableBusy" selectable :select-mode="selectMode" selected-variant="primary" :items="getItems" :fieldsComputed="getFields" @row-selected="onRowSelected" responsive="sm" :current-page="currentPage" :per-page="perPage"><!---->
+      <b-table sticky-header hover :head-variant="headVariant" ref="TableB" id="TableB" :busy="tableBusy" selectable :select-mode="selectMode" selected-variant="primary" :items="getShops" :fieldsComputed="getFields" @row-selected="onRowSelected" responsive="sm" :current-page="currentPage" :per-page="perPage"><!---->
      
-        <!-- This Block changes the visibility of the selected row -->
+        <!-- This Block changes the visibility of the selected row 
         <template v-slot:cell(selected)="{ rowSelected }">
           <template v-if="rowSelected">
             <span aria-hidden="true">&check;</span>
@@ -42,28 +40,17 @@
             <span aria-hidden="true">&nbsp;</span>
             <span class="sr-only">Not selected</span>
           </template>
-        </template>
+        </template>-->
 
         <!--"'nameInput'+row.item.id"  -->
         <template v-slot:cell(name)="row">
-          <b-form-input v-if="row.item.actions.buttonToggle" v-bind:id="'nameInput'+row.item.id" v-model="row.item.name" placeholder="enter the Store's name here" size="sm">{{row.item.name}}</b-form-input><!--disabled-->
-          <router-link v-else v-bind:to="'/store/'+row.item.id">{{row.item.name}}</router-link>
-        </template>
-
-        <!--  -->
-        <template v-slot:cell(capacity)="row">
-          <b-form-input v-if="row.item.actions.buttonToggle" v-bind:id="'capacityInput'+row.item.id" v-model="row.item.capacity" placeholder="enter the Store's capacity here" size="sm">{{row.item.capacity}}</b-form-input><!--disabled-->
-          <div v-else >{{row.item.capacity}}</div>
-        </template>
-
-        <!--  -->
-        <template v-slot:cell(load)="row">
-          <b-progress v-bind:id="row.item.id" :value="row.item.load" :max="row.item.capacity" show-value variant="secondary"></b-progress>
+          <router-link v-bind:to="'/store/'+row.item.id">{{row.item.name}}</router-link>  
         </template>
 
         <!--  -->
         <template v-slot:cell(actions)="row">
-          <b-button v-bind:id="row.item.id" v-bind:variant="row.item.actions.buttonVariant" @click="toggleButtons" size="sm" >Edit</b-button><!--<b-icon icon="pencil-square" ></b-icon>-->
+          <b-button v-bind:variant="row.item.actions.editButtonVariant" @click="showModal(Number(row.item.id))" size="sm" >Edit</b-button><!--<b-icon icon="pencil-square" ></b-icon>-->
+          <b-button v-bind:variant="row.item.actions.deleteButtonVariant" @click="del(row.item.id)" size="sm">Delete</b-button>
         </template>
 
       </b-table>
@@ -79,7 +66,7 @@
                 </b-col>
 
                 <b-col class="col-sm-10">
-                  <b-pagination align="fill" size="sm" v-model="currentPage" :total-rows="getItemsCount" :per-page="perPage" first-text="First" prev-text="Prev" next-text="Next" last-text="Last"></b-pagination>   
+                  <b-pagination align="fill" size="sm" v-model="currentPage" :total-rows="getShopsCount" :per-page="perPage" first-text="First" prev-text="Prev" next-text="Next" last-text="Last"></b-pagination>   
                 </b-col>
               </b-row>
             </b-col>
@@ -90,7 +77,7 @@
 
     </b-card>
     
-    <editModal v-on:emit-store="createStore"></editModal>
+    <editModal></editModal>
   </div>
 </template>
 
@@ -114,12 +101,12 @@ export default {
         pageOptions: [5, 10, 15, 20, 50],
         ids: [],
 
-        tableBusy: false
+        tableBusy: false,
            
       }
     },
     methods: {
-        ...mapActions(['toggleButton','loadItems','loadFields','addStore','loadPaintings','editStore']),
+        ...mapActions(['loadShops','loadFields','deleteShop','setFormShop']),
       onRowSelected(items) {
         this.selected = items;
         this.ids = [];
@@ -134,51 +121,37 @@ export default {
       clearSelected() {
         this.$refs.table.clearSelected()
       },
-      toggleButtons(event){
-        
-        if( this.getButtonstate(event.target.id) ){ // Vuex
-            
-            const editStoreFrag = {
-              id: event.target.id,
-              name: document.querySelector('#nameInput'+event.target.id).value,
-              capacity: document.querySelector('#capacityInput'+event.target.id).value,
-            }
-          this.editStore(editStoreFrag);
-          
-          this.tableBusy = true
-          this.$refs.table.refresh()
-          this.tableBusy = false
+      del(id){
+        console.log("Will delete id: " + id);
+        this.deleteShop(id); // Vuex
+        this.isBusy = !this.isBusy
+        this.$refs.TableB.refresh()
+        if(this.headVariant=='light'){
+          this.headVariant='dark';
+        }else{
+          this.headVariant='light';
         }
-
-        this.toggleButton(event.target.id); // Vuex
+        this.isBusy = !this.isBusy
       },
-      del(){
-        console.log(this.ids);
-        //this.items = this.items.filter( input => input.id!==id);
-      },
-      isolate(){
-        console.log(this.getItem(3).name);
-        console.log(this.getItem(3).capacity);
-      },
-      createStore(newStore){
-        this.addStore(newStore);
-			},
-      showModal(){
+      showModal(id){
+        if(id!==null){
+          this.setFormShop( this.getShop(id) );
+        }else{
+          this.setFormShop( {id: null, name: '', capacity: 1} );
+        }
+        //console.log('passed stor id: '+id);
         this.$bvModal.show( "modal" );
-      }
+      },
     
     },
     computed: {
-        ...mapGetters(['getItems','getFields', 'getItemsCount','getItem','getButtonstate']),
+        ...mapGetters(['getShops','getFields', 'getShopsCount','getShop']),
     },
     created(){
         //console.log("CREATED:");
         this.loadFields();
-        this.loadItems();
-        this.loadPaintings();
+        this.loadShops();
     },
-    beforeDestroy(){
-      console.log("Before destruction from TableB");
-    }
+    
 }
 </script>

@@ -1,32 +1,31 @@
-import axios from 'axios';
+import {AXIOS} from './http-commons.js'
 
 const state = {
     fields:  [],
-    items: [],
-    paintings: []
+    shops: [],
+    formShop: {id: null, name: '', capacity: 1},
+    paintings: [],
+    formPainting: {id: null, authorName: 'Anonymous', name: '', price: 0}
+
 };
 
 const getters = {
-    getItems: (state) => state.items,
-    getItem: (state) => (id) => {
-        return state.items.find( item => item.id == id )
+    getShops: (state) => state.shops,
+    getShop: (state) => (id) => {
+        return state.shops.find( shop => shop.id == id )
     },
-    getItemsCount: (state) => state.items.length,
+    getFormShop: (state) => state.formShop,
+    getShopsCount: (state) => state.shops.length,
 
     getFields: (state) => state.fields,
     
-    getPaintingsByStoreId: (state) => (storeId) =>{
-        return state.paintings.filter( painting => painting.storeId == storeId )
-    },
     getPaintings: (state) => state.paintings,
     getPainting: (state) => (id) => {
         return state.paintings.find( painting => painting.id == id)
     },
+    getFormPainting: (state) => state.formPainting,
     getPaintingsCount: (state) => state.paintings.length,
-    
-    getButtonstate: (state) => (id) => {
-        return state.items.find( item => item.id == id ).actions.buttonToggle
-    },
+
     getSelectedPaintingIds: (state)=>{
         let filtered =  state.paintings.filter( painting => painting.selected );
         let output = []
@@ -39,132 +38,78 @@ const getters = {
 };
 
 const actions = {
-    async loadItems({commit}){
-        //console.log("!!!! loadItems !!!!!");
-        let items = [
-            { id: 1, name: 'StoreOne', capacity: 40 },
-            { id: 2, name: 'StoreTwo', capacity: 21 },
-            { id: 3, name: 'StoreThree', capacity: 89 },
-            { id: 4, name: 'StoreFour', capacity: 38 },
-            { id: 5, name: 'StoreFive', capacity: 40 },
-            { id: 6, name: 'StoreSix', capacity: 21 },
-            { id: 7, name: 'StoreSeven', capacity: 89 },
-            { id: 8, name: 'StoreEight', capacity: 38 },
-            { id: 9, name: 'StoreNine', capacity: 40 },
-            { id: 10, name: 'StoreTen', capacity: 21 },
-            { id: 11, name: 'StoreEleven', capacity: 89 },
-            { id: 12, name: 'StoreTwelve', capacity: 38 }
-        ];
-        items = items.map( item => {
-            const newObj = {...item, actions: { caption: 'edit', buttonToggle: false, buttonVariant: 'outline-primary' } };
-            return newObj;
-        }); 
+    async loadShops({commit}){
 
-        commit('commitItems',items);
+        const response = await AXIOS.get('http://localhost:8081/stores/' );
+        commit('commitShops',response.data);
         
     },
-    async loadPaintings({commit}){
-
-        let paintings = [
-            { id: 1, storeId: 1, authorName: 'author name', name: 'PaintingOne', price: 40 },
-            { id: 2, storeId: 2, authorName: 'aut horname', name: 'PaintingTwo', price: 21 },
-            { id: 3, storeId: 3, authorName: 'author name', name: 'PaintingThree', price: 89 },
-            { id: 4, storeId: 1, authorName: 'author name', name: 'PaintingFour', price: 38 },
-            { id: 5, storeId: 1, authorName: 'author name', name: 'PaintingOne', price: 40 },
-            { id: 6, storeId: 1, authorName: 'authorna me', name: 'PaintingOne', price: 21 },
-            { id: 7, storeId: 2, authorName: 'aut horname', name: 'PaintingOne', price: 89 },
-            { id: 8, storeId: 1, authorName: 'author name', name: 'PaintingOne', price: 38 },
-            { id: 9, storeId: 3, authorName: 'aut horname', name: 'PaintingOne', price: 40 },
-            { id: 10, storeId: 1, authorName: 'author name', name: 'PaintingOne', price: 21 },
-            { id: 11, storeId: 2, authorName: 'authorname', name: 'PaintingOne', price: 89 },
-            { id: 12, storeId: 4, authorName: 'authorna me', name: 'PaintingOne', price: 38 },
-            { id: 13, storeId: 1, authorName: 'author name', name: 'PaintingOne', price: 40 },
-            { id: 14, storeId: 2, authorName: 'aut horname', name: 'PaintingTwo', price: 21 },
-            { id: 15, storeId: 3, authorName: 'author name', name: 'PaintingThree', price: 89 },
-            { id: 16, storeId: 1, authorName: 'author name', name: 'PaintingFour', price: 38 },
-            { id: 17, storeId: 1, authorName: 'author name', name: 'PaintingOne', price: 40 },
-            { id: 18, storeId: 1, authorName: 'authorna me', name: 'PaintingOne', price: 21 },
-            { id: 19, storeId: 2, authorName: 'aut horname', name: 'PaintingOne', price: 89 },
-            { id: 20, storeId: 1, authorName: 'author name', name: 'PaintingOne', price: 38 },
-            { id: 21, storeId: 3, authorName: 'aut horname', name: 'PaintingOne', price: 40 },
-            { id: 22, storeId: 1, authorName: 'author name', name: 'PaintingOne', price: 21 },
-            { id: 23, storeId: 2, authorName: 'authorname', name: 'PaintingOne', price: 89 },
-            { id: 24, storeId: 4, authorName: 'authorna me', name: 'PaintingOne', price: 38 }
-        ];
-        // paintings = paintings.map( painting => {
-        //     const newObj = {...painting, selected: false };
-        //     return newObj;
-        // });
-
-        commit('commitPaintings',paintings);
-        
+    async setFormShop({commit}, store){
+        commit('commitFormShop',store);
+    },
+    async loadPaintings({commit},storeId){
+        const response = await AXIOS.get('http://localhost:8081/stores/' + storeId + '/paintings' );
+        commit('commitPaintings', response.data);
     },
     async loadFields({commit}){
-        
         let fields = ['id', 'name', 'capacity', 'load'];
         fields = [...fields, 'actions'];
         commit('commitFields',fields);
     },
-    async addStore({commit}, newStore){
-        // Usually you POST to the Database and feed the respond to the commit
-
-        // Create an ID
-        newStore.id = this.getters.getItemsCount+1;
-        // Add editButton
-        newStore = {...newStore, actions: { caption: 'edit', buttonToggle: false, buttonVariant: 'outline-primary' } };
-        console.log(newStore);
-        commit('commitAddStore', newStore);
+    async addShop({commit}, shop){
+        const response = await AXIOS.post('http://localhost:8081/stores/', shop );
+        let clone = response.data;
+        clone = {...clone, actions: { caption: 'edit', buttonToggle: false, buttonVariant: 'outline-primary' } };
+        commit('commitAddShop', clone);
     },
-    async editStore({commit}, editStoreFrag){
-        commit('commitEditStore',editStoreFrag);
+    async deleteShop(shopId){
+        const response = await AXIOS.delete('http://localhost:8081/stores/'+shopId );
+        console.log("Deleted Shop: " + response.data);
+        //commit('commitDeleteShop', response.data);
     },
-    async toggleButton({commit},btnId){
-        commit('toggleButton',btnId);
-    },
-    async addPainting({commit}, newPainting){
-        // Usually you POST to the Database and feed the respond to the commit
-        commit('commitAddPainting', newPainting);
+    async addPainting({commit}, painting){
+        const response = await AXIOS.post('http://localhost:8081/stores/' + painting.storeId + '/paintings', painting );
+        commit('commitAddPainting', response.data);
     },
     async deleteSelectedPainting({commit}, id){
         commit('commitdeleteSelectedPainting', id);
+    },
+    async setFormPainting({commit}, formPainting){
+        commit('commitFormPainting',formPainting);
     }
 
 };
 
 const mutations = {
     // Table / Store
-    commitItems:(state, items) => {
-        state.items = items;
+    commitShops:(state, shops) => {
+        state.shops = shops;
+        state.shops = shops.map( shop => {
+            const newObj = {...shop, actions: { editCaption: 'edit', editButtonToggle: false, editButtonVariant: 'outline-primary', deleteCaption: 'delete', deleteButtonVariant: 'outline-danger' } };
+            //console.log(item.name);
+            return newObj;
+        }); 
+    },
+    commitFormShop:(state, shop) => {
+        state.formShop = shop;
     },
     commitFields:(state, fields) => {
         state.fields = fields;
     },
-    // Button
-    toggleButton: (state, btnId) => {
-        state.items.forEach(function(item){
-            if(item.id == btnId){
-                item.actions.buttonToggle = !item.actions.buttonToggle;
-                if(item.actions.buttonToggle){
-                    item.actions.buttonVariant = 'outline-danger';
-                }else{
-                    item.actions.buttonVariant = 'outline-primary';
-                }
-            }
 
-        });
-    },
     // Store
-    commitAddStore: (state,newStore) => {
-        state.items.push(newStore);
+    commitAddShop: (state, newShop) => {
+        const index = state.shops.findIndex(shop => shop.id === newShop.id);
+        if(index!==-1){
+            state.shops.splice(index,1,newShop);
+        }else{
+            state.shops.unshift(newShop); // unshift is the opposite of push
+        }
     },
-    commitEditStore: (state, editStoreFrag)=>{
-        state.items.forEach( item => {
-            if(item.id == editStoreFrag.id){
-                item.name = editStoreFrag.name;
-                item.capacity = editStoreFrag.capacity;
-            }
-        });
+    commitDeleteShop:(state,shopId) => {
+        state.shops = state.shops.filter(shop => shop.id !== shopId);
     },
+
     // Paintings
     commitPaintings: (state, paintings) => {
         state.paintings = paintings;
@@ -176,29 +121,21 @@ const mutations = {
             }
         });
     },
-    commitAddPainting: (state, newPainting) => {
+    commitAddPainting: (state, paintingDTO) => {
         
-        if(newPainting.id===null){
-            let num = 0;
-            state.paintings.forEach(painting => {
-                if( painting.id > num ){
-                    num = painting.id;
-                }
-            });
-            newPainting.id = num +1;
-            //state.paintings.forEach(painting=>console.log(painting.id));
-            state.paintings.push(newPainting);
-
+        const index = state.paintings.findIndex(painting => painting.id === paintingDTO.id);
+        if(index!==-1){
+            state.paintings.splice(index,1,paintingDTO);
         }else{
-            const index = state.paintings.findIndex(painting => painting.id === newPainting.id);
-            if(index!==-1){
-                state.paintings.splice(index,1,newPainting);
-            }
+            state.paintings.unshift(paintingDTO);
         }
         
     },
-    commitdeleteSelectedPainting: (state,id) => {
+    commitdeleteSelectedPainting: (state, id) => {
         state.paintings = state.paintings.filter( painting => painting.id != id);
+    },
+    commitFormPainting: (state, formPainting) => {
+        state.formPainting = formPainting;
     }
 };
 
