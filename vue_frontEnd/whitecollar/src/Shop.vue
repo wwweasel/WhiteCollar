@@ -15,7 +15,7 @@
                                 </div>
                             </b-col>
                             <b-col class="col-8">
-                                <b-progress :value="getPaintings.length" :max="getShop($route.params.shopId).capacity" show-progress variant="secondary"></b-progress>
+                                <b-progress :value="getShopPaintings(Number(shopId)).length" :max="getShop($route.params.shopId).capacity" show-progress variant="secondary"></b-progress>
                             </b-col>
                         </b-row>
                     </b-col>
@@ -30,7 +30,7 @@
                     
                     <!--v-bind:class="{ 'active' : isSelected(0) }" v-on:click="selected = 0" v-on:mouseleave="mouseleave(painting.id)"-->
                     
-                    <div v-for="(painting,index) in getPaintings" v-bind:key="painting.id">
+                    <div v-for="(painting,index) in getShopPaintings(Number(shopId))" v-bind:key="painting.id">
                             
                         <b-list-group-item class="flex-column align-items-start" :variant="index%2==0 ? 'secondary' : 'default'">
                             <b-media>
@@ -56,7 +56,7 @@
                             <!-- EDIT -->
                             </b-media>
                             <b-collapse :id="'itemCollapse'+painting.id">
-                                <AddPainting @createPainting="close(painting.id)"></AddPainting>
+                                <AddPainting @closeCollapse="close(painting.id)"></AddPainting>
                             </b-collapse>
                         </b-list-group-item>
 
@@ -64,8 +64,9 @@
 
                     <!-- CREATE -->
                     <b-list-group-item >
-                        <b-collapse v-model="createToggled"><!-- This will be toggled by the Create Button in the Footer -->
-                            <AddPainting @createPainting="createCollapse"></AddPainting>
+                        <b-collapse v-model="createToggle"><!-- This will be toggled by the Create Button in the Footer -->
+                            <b-alert fade v-if="addPaintingAlert" v-model="addPaintingAlert" variant="danger">{{getShop(Number(shopId)).full}}</b-alert><!--getShop(Number(shopId)).full-->
+                            <AddPainting v-else @closeCollapse="createCollapse"></AddPainting><!--@createPainting="createCollapse"-->
                         </b-collapse>
                     </b-list-group-item>
 
@@ -111,15 +112,15 @@ export default {
     },
     data() {
       return {        
-        createToggled: false,
         createVariant: 'primary',
+        createToggle: false,
       }
     },
     methods: {
-        ...mapActions(['loadPaintings','deleteSelectedPainting','setFormPainting']),
+        ...mapActions(['loadPaintings','deleteSelectedPainting','setFormPainting','setCreateButtonState']),
         createCollapse(){
-            this.createToggled = !this.createToggled;
-            if(this.createToggled){
+            this.createToggle = !this.createToggle;
+            if(this.createToggle){
                 this.createVariant = 'danger';
                 this.$refs.createItem.innerHTML = 'Cancel';
                 
@@ -137,19 +138,18 @@ export default {
         },
         deletePainting(paintingId){
             //console.log(paintingId);
-            this.deleteSelectedPainting(paintingId);
+            this.deleteSelectedPainting( this.getPainting(paintingId) );
         },
         close(paintingId){
             document.getElementById('icon'+paintingId).click();
         }
     },
     computed: {
-        ...mapGetters(['getPaintings','getPainting','getShop']),
+        ...mapGetters(['getPainting','getShop','getShopPaintings','getCreateButtonState']),
+        addPaintingAlert() {
+            return this.getShop(Number(this.shopId)).full !== null;
+        },
     },
-    created(){
-      this.loadPaintings(Number(this.shopId));
-      //console.log('shopId: ' + this.shopId);
-    }
     
 }
 </script>

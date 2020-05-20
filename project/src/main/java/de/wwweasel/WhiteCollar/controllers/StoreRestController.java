@@ -25,7 +25,7 @@ import de.wwweasel.WhiteCollar.services.StoreService;
 
 //@CrossOrigin(origins = {"http://localhost:8080", "http://anotherdomain:8080/store","http://anotherdomain:8080/createSpy","*"})
 @RestController
-@RequestMapping("/stores")
+//@RequestMapping("/stores")
 public class StoreRestController {
 	
 	@Autowired
@@ -35,7 +35,7 @@ public class StoreRestController {
 	
 	
 	// GET 
-	@RequestMapping(method=RequestMethod.GET,value={"","/"})
+	@RequestMapping(method=RequestMethod.GET,value={"/stores","/stores/"})
 	public List<StoreDTO> index() {
 		return storeService.findAll()
 				.stream()
@@ -43,8 +43,8 @@ public class StoreRestController {
 				.collect( Collectors.toList() );
 	}
 	
-	@RequestMapping(method=RequestMethod.GET,value={"/{id}/paintings"})
-	public List<PaintingDTO> index(@PathVariable Integer id) {
+	@RequestMapping(method=RequestMethod.GET,value={"/stores/{id}/paintings"})
+	public List<PaintingDTO> getShopPaintings(@PathVariable Integer id) {
 		Store store = storeService.findById(id);
 		return store.getPaintings()
 				.stream()
@@ -52,30 +52,38 @@ public class StoreRestController {
 				.collect(Collectors.toList());
 	}
 	
+	@RequestMapping(method=RequestMethod.GET,value={"/paintings"})
+	public List<PaintingDTO> getPaintings() {
+		return paintingService.findAll()
+		.stream()
+		.map( painting -> paintingService.convertToDTO(painting) )
+		.collect(Collectors.toList());
+	}
+	
 	
 	
 	// POST
-	@RequestMapping(method=RequestMethod.POST,value="/")
+	@RequestMapping(method=RequestMethod.POST,value="/stores/")
 	public StoreDTO create(@RequestBody StoreDTO dto) {
 		return storeService.convertToDTO( storeService.save( storeService.convertToPainting(dto) ) );
 	}
 	
-	@RequestMapping(method=RequestMethod.POST,value="/{id}/paintings")
+	@RequestMapping(method=RequestMethod.POST,value="/stores/{id}/paintings")
 	public PaintingDTO create(@RequestBody PaintingDTO dto) {
 		return paintingService.convertToDTO( paintingService.save( paintingService.convertToPainting(dto) ) );
 	}
 	
 
-	@RequestMapping(method=RequestMethod.DELETE,value="/{id}")
-	public void deleteStore(@PathVariable Integer id) {
-		System.out.println("Pseudo dlete: " + id);
-		//storeService.delete(id);
-		//return ResponseEntity.noContent().build();
+	@RequestMapping(method=RequestMethod.DELETE,value="/stores/{id}")
+	public ResponseEntity<Void> deleteStore(@PathVariable Integer id) {
+		storeService.delete(id);
+		return ResponseEntity.noContent().build();
 	}
 	
-	@RequestMapping(method=RequestMethod.DELETE,value="/{id}/paintings/{paintingId}")
-	public void deletePainting(@PathVariable Integer id, @PathVariable Integer paintingId) {
+	@RequestMapping(method=RequestMethod.DELETE,value="/stores/{id}/paintings/{paintingId}")
+	public ResponseEntity<Void> deletePainting(@PathVariable Integer id, @PathVariable Integer paintingId) {
 		paintingService.delete(paintingId);
+		return ResponseEntity.noContent().build();
 	}
 	
 	

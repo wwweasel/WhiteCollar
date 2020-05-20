@@ -14,7 +14,7 @@ public class ApiExceptionHandler {
 	@ExceptionHandler(value=ApiRequestException.class)
 	public ResponseEntity<Object> handleException(ApiRequestException e){
 		
-		HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
+		HttpStatus httpStatus = HttpStatus.UNPROCESSABLE_ENTITY;
 		
 		// Copy payload of ApiRequestException into ApiException
 		ExceptionDTO apiException = new ExceptionDTO( e.message, httpStatus, LocalDateTime.now() );

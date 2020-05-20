@@ -47,6 +47,12 @@
           <router-link v-bind:to="'/store/'+row.item.id">{{row.item.name}}</router-link>  
         </template>
 
+        <!-- -->
+        <template v-slot:cell(load)="row">
+          <b-progress :value="getShopPaintings(Number(row.item.id)).length" :max="getShop(row.item.id).capacity" show-progress variant="secondary"></b-progress>
+        </template>
+        
+
         <!--  -->
         <template v-slot:cell(actions)="row">
           <b-button v-bind:variant="row.item.actions.editButtonVariant" @click="showModal(Number(row.item.id))" size="sm" >Edit</b-button><!--<b-icon icon="pencil-square" ></b-icon>-->
@@ -77,18 +83,18 @@
 
     </b-card>
     
-    <editModal></editModal>
+    <shopModal></shopModal>
   </div>
 </template>
 
 <script>
 import { mapGetters, mapActions } from 'vuex';
-import EditModal from '@/components/EditModal.vue';
+import ShopModal from '@/components/ShopModal.vue';
 
 export default {
     name: "TableB",
     components: {
-      'editModal': EditModal
+      'shopModal': ShopModal
     },
     data() {
       return {
@@ -106,7 +112,7 @@ export default {
       }
     },
     methods: {
-        ...mapActions(['loadShops','loadFields','deleteShop','setFormShop']),
+        ...mapActions(['loadShops','loadFields','deleteShop','setFormShop','loadPaintings','loadPaintings']),
       onRowSelected(items) {
         this.selected = items;
         this.ids = [];
@@ -121,17 +127,16 @@ export default {
       clearSelected() {
         this.$refs.table.clearSelected()
       },
-      del(id){
-        console.log("Will delete id: " + id);
-        this.deleteShop(id); // Vuex
-        this.isBusy = !this.isBusy
+      del(shopId){
+        this.deleteShop(shopId); // Vuex
+        this.tableBusy = !this.tableBusy
         this.$refs.TableB.refresh()
         if(this.headVariant=='light'){
           this.headVariant='dark';
         }else{
           this.headVariant='light';
         }
-        this.isBusy = !this.isBusy
+        this.tableBusy = !this.tableBusy
       },
       showModal(id){
         if(id!==null){
@@ -145,12 +150,13 @@ export default {
     
     },
     computed: {
-        ...mapGetters(['getShops','getFields', 'getShopsCount','getShop']),
+        ...mapGetters(['getShops','getFields', 'getShopsCount','getShop','getShopPaintings']),
     },
     created(){
         //console.log("CREATED:");
         this.loadFields();
         this.loadShops();
+        this.loadPaintings();
     },
     
 }

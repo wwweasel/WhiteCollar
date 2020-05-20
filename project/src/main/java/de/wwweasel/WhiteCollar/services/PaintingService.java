@@ -6,8 +6,10 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import de.wwweasel.WhiteCollar.Exceptions.ApiRequestException;
 import de.wwweasel.WhiteCollar.dto.PaintingDTO;
 import de.wwweasel.WhiteCollar.entities.Painting;
+import de.wwweasel.WhiteCollar.entities.Store;
 import de.wwweasel.WhiteCollar.repos.PaintingRepo;
 import de.wwweasel.WhiteCollar.repos.StoreRepo;
  
@@ -19,8 +21,13 @@ public class PaintingService {
 	@Autowired
 	StoreRepo storeRepo;
 	
-	public Painting save(Painting painting){
-		return repo.save(painting);
+	public Painting save(Painting painting) throws ApiRequestException{
+		Store store = storeRepo.findById( painting.getStore().getId() ).get();
+		if( store.getPaintings().size() >= store.getCapacity() ) {
+			throw new ApiRequestException("StoreCapacity full!");
+		}else {
+			return repo.save(painting);			
+		}
 	}
 	
 	public void delete(Integer id) {

@@ -1,8 +1,8 @@
 <template>
     <div>
         <b-form inline class="d-flex justify-content-between" @submit="createPainting"> 
-            <b-input v-model="authorName" id="authorname" class="flex-fill" placeholder="Authorname"></b-input>                                
             <b-input v-model="name" id="name" class="flex-fill" placeholder="Name"></b-input>
+            <b-input v-model="authorName" id="authorname" class="flex-fill" placeholder="Authorname"></b-input>                                
             <b-input v-model="price" type="number" id="price" class="flex-fill" placeholder="Price"></b-input>
             <b-button type="submit" id="save" class="flex-fill" variant="secondary">Save</b-button>
         </b-form>
@@ -56,7 +56,7 @@ export default {
         createPainting(event){
             event.preventDefault();
             this.addPainting( this.getFormPainting );
-            this.$emit('createPainting');// So that the parent(Store.vue) can collapse the form after createion. 
+            this.$emit('closeCollapse');// So that the parent(Shop.vue) can collapse the form after createion. 
         },
     },
 }

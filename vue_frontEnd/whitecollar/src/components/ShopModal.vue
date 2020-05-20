@@ -56,7 +56,7 @@
       }
     },
     methods: {
-      ...mapActions(['addShop','setFormShop']),
+      ...mapActions(['addShop','setFormShop','loadShops']),
       checkFormValidity() {
         const valid = this.$refs.form.checkValidity()
         this.nameState = valid

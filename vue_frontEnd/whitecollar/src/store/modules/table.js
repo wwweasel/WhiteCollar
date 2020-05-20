@@ -1,3 +1,4 @@
+import Vue from "vue";
 import {AXIOS} from './http-commons.js'
 
 const state = {
@@ -5,7 +6,9 @@ const state = {
     shops: [],
     formShop: {id: null, name: '', capacity: 1},
     paintings: [],
-    formPainting: {id: null, authorName: 'Anonymous', name: '', price: 0}
+    formPainting: {id: null, shopId: null, authorName: 'Anonymous', name: '', price: 0},
+
+    createButtonState: false
 
 };
 
@@ -20,62 +23,80 @@ const getters = {
     getFields: (state) => state.fields,
     
     getPaintings: (state) => state.paintings,
+    getShopPaintings: (state) => (shopId) => {
+        return state.paintings.filter( painting => painting.shopId === shopId );
+    },
     getPainting: (state) => (id) => {
         return state.paintings.find( painting => painting.id == id)
     },
     getFormPainting: (state) => state.formPainting,
     getPaintingsCount: (state) => state.paintings.length,
 
-    getSelectedPaintingIds: (state)=>{
-        let filtered =  state.paintings.filter( painting => painting.selected );
-        let output = []
-        filtered.forEach(painting=>{
-            output.push(painting.id);
-        });
-        return output;
-    }
+    getCreateButtonState: (state) => state.createButtonState,
     
 };
 
 const actions = {
     async loadShops({commit}){
-
         const response = await AXIOS.get('http://localhost:8081/stores/' );
         commit('commitShops',response.data);
-        
     },
     async setFormShop({commit}, store){
         commit('commitFormShop',store);
     },
-    async loadPaintings({commit},storeId){
-        const response = await AXIOS.get('http://localhost:8081/stores/' + storeId + '/paintings' );
+    async loadPaintings({commit}){
+        const response = await AXIOS.get('http://localhost:8081/paintings' );
         commit('commitPaintings', response.data);
     },
+    // async loadShopPaintings({commit},storeId){
+    //     const response = await AXIOS.get('http://localhost:8081/stores/' + storeId + '/paintings' );
+    //     commit('commitShopPaintings', response.data);
+    // },
     async loadFields({commit}){
-        let fields = ['id', 'name', 'capacity', 'load'];
-        fields = [...fields, 'actions'];
+        let fields = ['id', 'name', 'capacity','load'];
+        fields = [...fields,'actions'];
         commit('commitFields',fields);
     },
     async addShop({commit}, shop){
-        const response = await AXIOS.post('http://localhost:8081/stores/', shop );
-        let clone = response.data;
-        clone = {...clone, actions: { caption: 'edit', buttonToggle: false, buttonVariant: 'outline-primary' } };
-        commit('commitAddShop', clone);
+        const response = await AXIOS.post('http://localhost:8081/stores/', shop );       
+        commit('commitAddShop', response.data);
     },
-    async deleteShop(shopId){
+    async deleteShop({commit}, shopId){
         const response = await AXIOS.delete('http://localhost:8081/stores/'+shopId );
-        console.log("Deleted Shop: " + response.data);
-        //commit('commitDeleteShop', response.data);
+        if(response.status === 204){
+            commit('commitDeleteShop', shopId);
+        }else{
+            alert("Could not delete Shop with ID: " + shopId);
+        }
     },
     async addPainting({commit}, painting){
-        const response = await AXIOS.post('http://localhost:8081/stores/' + painting.storeId + '/paintings', painting );
-        commit('commitAddPainting', response.data);
+        console.log("vuex: " + painting.id +" "+painting.shopId);
+        await AXIOS.post('http://localhost:8081/stores/' + painting.storeId + '/paintings', painting )
+        .then(response => commit('commitAddPainting', response.data) )
+        .catch(error => {
+            const index = state.shops.findIndex(shop => shop.id === painting.shopId);
+            if(index!==-1){
+                Vue.set(state.shops[index], 'full', error.response.data.message );
+            }
+            alert(state.shops[index].full);
+            //console.log("Error:" + state.shops[index].full);
+        } );//alert(error.response.data.message)
+
     },
-    async deleteSelectedPainting({commit}, id){
-        commit('commitdeleteSelectedPainting', id);
+    async deleteSelectedPainting({commit}, painting){
+        const response = await AXIOS.delete('http://localhost:8081/stores/'+ painting.shopId + "/paintings/" + painting.id );
+        if(response.status === 204){
+            commit('commitdeleteSelectedPainting', painting.id);
+        }else{
+            alert("Could not delete Painting with ID: " + painting.id);
+        }
     },
     async setFormPainting({commit}, formPainting){
         commit('commitFormPainting',formPainting);
+    },
+
+    setCreateButtonState({commit}){
+        commit('commitCreateButtonState');
     }
 
 };
@@ -85,7 +106,7 @@ const mutations = {
     commitShops:(state, shops) => {
         state.shops = shops;
         state.shops = shops.map( shop => {
-            const newObj = {...shop, actions: { editCaption: 'edit', editButtonToggle: false, editButtonVariant: 'outline-primary', deleteCaption: 'delete', deleteButtonVariant: 'outline-danger' } };
+            const newObj = {...shop, load: 0, actions: { editCaption: 'edit', editButtonToggle: false, editButtonVariant: 'outline-primary', deleteCaption: 'delete', deleteButtonVariant: 'outline-danger' }, full: null };
             //console.log(item.name);
             return newObj;
         }); 
@@ -99,6 +120,9 @@ const mutations = {
 
     // Store
     commitAddShop: (state, newShop) => {
+
+        newShop = {...newShop, load: 0, actions: { editCaption: 'edit', editButtonToggle: false, editButtonVariant: 'outline-primary', deleteCaption: 'delete', deleteButtonVariant: 'outline-danger' }, full: null };
+
         const index = state.shops.findIndex(shop => shop.id === newShop.id);
         if(index!==-1){
             state.shops.splice(index,1,newShop);
@@ -106,7 +130,7 @@ const mutations = {
             state.shops.unshift(newShop); // unshift is the opposite of push
         }
     },
-    commitDeleteShop:(state,shopId) => {
+    commitDeleteShop:(state, shopId) => {
         state.shops = state.shops.filter(shop => shop.id !== shopId);
     },
 
@@ -114,6 +138,9 @@ const mutations = {
     commitPaintings: (state, paintings) => {
         state.paintings = paintings;
     },
+    // commitShopPaintings: (state, shopPaintings) => {
+    //     state.shopPaintings = shopPaintings;
+    // },
     commitTogglePaintingSelectState: (state,paintingId) => {
         state.paintings.forEach( painting => {
             if(painting.id == paintingId){
@@ -121,21 +148,32 @@ const mutations = {
             }
         });
     },
-    commitAddPainting: (state, paintingDTO) => {
-        
-        const index = state.paintings.findIndex(painting => painting.id === paintingDTO.id);
+    commitAddPainting: (state, newPainting) => {
+        const index = state.paintings.findIndex(painting => painting.id === newPainting.id);
         if(index!==-1){
-            state.paintings.splice(index,1,paintingDTO);
+            state.paintings.splice( index, 1, newPainting );
         }else{
-            state.paintings.unshift(paintingDTO);
+            state.paintings.unshift( newPainting );
+
+            // Alos increment the Shop load by one
+            const index = state.shops.findIndex(shop => shop.id === newPainting.shopId);
+            if(index!==-1){
+                Vue.set(state.shops[index], 'load', state.shops[index].load+1);
+            }
+
+            state.createButtonState = false;
         }
         
     },
-    commitdeleteSelectedPainting: (state, id) => {
-        state.paintings = state.paintings.filter( painting => painting.id != id);
+    commitdeleteSelectedPainting: (state, paintingId) => {
+        state.paintings = state.paintings.filter( painting => painting.id != paintingId);
     },
     commitFormPainting: (state, formPainting) => {
         state.formPainting = formPainting;
+    },
+
+    commitCreateButtonState: (state) => {
+        state.createButtonState = ! state.createButtonState;
     }
 };
 
