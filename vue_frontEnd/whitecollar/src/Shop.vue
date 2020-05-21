@@ -81,11 +81,9 @@
 
 
             <template v-slot:footer>
-                <b-nav pills v-b-scrollspy:nav-scroller>
+                <b-nav pills v-b-scrollspy:nav-scroller><!--@submit.prevent="'#createSpy'" action="#createSpy" :action="'http://localhost:8080/store/'+shopId+'#createSpy'" method="get"-->
                     <b-list-group horizontal >
-                        <form action="http://localhost:8080/#createSpy">
-                            <b-button type="submit" @click="createCollapse" id="createItem" ref="createItem" :variant="createVariant">Create</b-button>
-                        </form>
+                        <b-button @click="createCollapse" id="createItem" ref="createItem" :variant="createVariant">Create</b-button>
                     </b-list-group>
                 </b-nav>
             </template>
@@ -116,7 +114,13 @@ export default {
     },
     methods: {
         ...mapActions(['loadPaintings','deleteSelectedPainting','setFormPainting','setCreateButtonState']),
+        handleSubmit(event){
+            console.log(event.target.action);
+            
+        },
         createCollapse(){
+            window.location.href = '#createSpy'; // ScrollSpy!
+
             this.createToggle = !this.createToggle;
             if(this.createToggle){
                 this.createVariant = 'danger';
