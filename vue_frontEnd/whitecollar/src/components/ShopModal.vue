@@ -85,7 +85,8 @@
         // console.log("Before: ");
         // console.log(this.getFormShop.id);
         // console.log(this.getFormShop.name);
-        // console.log(this.getFormShop.capacity);    
+        // console.log(this.getFormShop.capacity);
+        sessionStorage.setItem("test","geil"); 
         this.addShop(this.getFormShop);
         // Hide the modal manually
         this.resetModal();

@@ -28,8 +28,6 @@
             
                 <b-list-group flush>
                     
-                    <!--v-bind:class="{ 'active' : isSelected(0) }" v-on:click="selected = 0" v-on:mouseleave="mouseleave(painting.id)"-->
-                    
                     <div v-for="(painting,index) in getShopPaintings(Number(shopId))" v-bind:key="painting.id">
                             
                         <b-list-group-item class="flex-column align-items-start" :variant="index%2==0 ? 'secondary' : 'default'">
