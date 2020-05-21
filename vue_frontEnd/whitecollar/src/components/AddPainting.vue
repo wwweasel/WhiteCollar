@@ -1,25 +1,6 @@
 <template>
     <div >
-        <!--<b-form inline class="d-flex justify-content-between" v-on:submit.prevent="submit">
-
-            <label label-for="name"></label>
-            <b-input v-model.trim="$v.name.$model" id="name" :class="{'is-invalid':true}" placeholder="Name"></b-input>
-
-            <label label-for="authorname"></label>
-            <b-input v-model.trim="$v.authorName.$model" id="authorname" :class="{'is-invalid':true}" placeholder="Authorname"></b-input>   
-
-            <label label-for="price"></label>
-            <b-input v-model.trim="$v.price.$model" type="number" id="price" :class="{'is-invalid':true }" placeholder="Price"></b-input>
-
-            <b-button type="submit" id="save" variant="secondary">Save</b-button>
-
-        </b-form>
-        <b-form inline v-if="submitStatus === 'ERROR'">
-            <b-alert variant="success" show class="error" v-if="!$v.name.required">Name is required</b-alert>
-            <b-alert variant="success" show class="error" v-if="!$v.authorName.required">AuthorName is required</b-alert>
-            <b-alert variant="success" show class="error" v-if="!$v.price.required">Price is required</b-alert>
-        </b-form>-->
-
+        
         <b-row class="justify-content-md-between">
             <b-col xs="12" md="3"><b-input v-model.trim="$v.name.$model" id="name" :class="{'is-invalid':validationStatus($v.name)}" placeholder="Name"></b-input></b-col>
             <b-col xs="12" md="3"><b-input v-model.trim="$v.authorName.$model" id="authorname" :class="{'is-invalid':validationStatus($v.authorName)}" placeholder="Authorname"></b-input></b-col>

@@ -1,5 +1,6 @@
 import Vue from "vue";
-import {AXIOS} from './http-commons.js'
+//import {AXIOS} from './http-commons.js'
+import AXIOS from 'axios'
 
 const state = {
     fields:  [],
@@ -70,7 +71,7 @@ const actions = {
         }
     },
     async addPainting({commit}, painting){
-        console.log("vuex: " + painting.id +" "+painting.shopId);
+        //console.log("vuex: " + painting.id +" "+painting.shopId);
         await AXIOS.post('http://localhost:8081/stores/' + painting.storeId + '/paintings', painting )
         .then(response => commit('commitAddPainting', response.data) )
         .catch(error => {
