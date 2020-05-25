@@ -22,4 +22,17 @@ public class ApiExceptionHandler {
 		return new ResponseEntity<Object>( apiException, httpStatus );
 		
 	}
+	
+	
+	@ExceptionHandler(value=ApiDeleteException.class)
+	public ResponseEntity<Object> handleException(ApiDeleteException e){
+		
+		HttpStatus httpStatus = HttpStatus.NOT_FOUND;
+		
+		// Copy payload of ApiRequestException into ApiException
+		ExceptionDTO apiException = new ExceptionDTO( e.message, httpStatus, LocalDateTime.now() );
+		
+		return new ResponseEntity<Object>( apiException, httpStatus );
+		
+	}
 }

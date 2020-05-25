@@ -2,10 +2,12 @@ package de.wwweasel.WhiteCollar.services;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import de.wwweasel.WhiteCollar.Exceptions.ApiDeleteException;
 import de.wwweasel.WhiteCollar.Exceptions.ApiRequestException;
 import de.wwweasel.WhiteCollar.dto.PaintingDTO;
 import de.wwweasel.WhiteCollar.entities.Painting;
@@ -21,22 +23,23 @@ public class PaintingService {
 	@Autowired
 	StoreRepo storeRepo;
 	
-	public Painting save(Painting painting) throws ApiRequestException{
+	public PaintingDTO save(PaintingDTO dto) throws ApiRequestException{
+		Painting painting = convertToPainting(dto);
 		Store store = storeRepo.findById( painting.getStore().getId() ).get();
 		if( store.getPaintings().size() >= store.getCapacity() ) {
 			throw new ApiRequestException("StoreCapacity full!");
 		}else {
-			return repo.save(painting);			
+			return convertToDTO( repo.save(painting) );		
 		}
 	}
 	
-	public void delete(Integer id) {
+	public void delete(Integer id) throws ApiDeleteException{
 		Optional<Painting> paintingOpt = repo.findById(id);
 		if(paintingOpt.isPresent()) {
 			Painting painting = paintingOpt.get();
 			repo.delete(painting);
 		}else {
-			System.out.println("Given id: " + id + " does not exist in DataBase");
+			throw new ApiDeleteException("Could not delete Painting with ID: " + id);
 		}
 	}
 	
@@ -49,12 +52,18 @@ public class PaintingService {
 		return painting;
 	}
 	
-	public List<Painting> findAll(){
-		return repo.findAll();
+	public List<PaintingDTO> findAll(){
+		return repo.findAll()
+				.stream()
+				.map(painting -> convertToDTO(painting) )
+				.collect(Collectors.toList());
 	}
 	
-	public List<Painting> paintingsByStoreId(Integer storeId) {
-		return repo.paintingsByStoreId(storeId);
+	public List<PaintingDTO> paintingsByStoreId(Integer storeId) {
+		return repo.paintingsByStoreId(storeId)
+				.stream()
+				.map(painting -> convertToDTO(painting)) // Convert the paintings to paintingDTOs
+				.collect(Collectors.toList());
 	}
 	
 	public PaintingDTO convertToDTO(Painting painting) {

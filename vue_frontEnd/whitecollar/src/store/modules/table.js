@@ -64,7 +64,7 @@ const actions = {
     },
     async deleteShop({commit}, shopId){
         const response = await AXIOS.delete('http://localhost:8081/stores/'+shopId );
-        if(response.status === 204){
+        if(response.status === 200){
             commit('commitDeleteShop', shopId);
         }else{
             alert("Could not delete Shop with ID: " + shopId);
@@ -86,7 +86,7 @@ const actions = {
     },
     async deleteSelectedPainting({commit}, painting){
         const response = await AXIOS.delete('http://localhost:8081/stores/'+ painting.shopId + "/paintings/" + painting.id );
-        if(response.status === 204){
+        if(response.status === 200){
             commit('commitdeleteSelectedPainting', painting.id);
         }else{
             alert("Could not delete Painting with ID: " + painting.id);

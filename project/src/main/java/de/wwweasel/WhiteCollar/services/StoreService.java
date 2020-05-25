@@ -2,10 +2,12 @@ package de.wwweasel.WhiteCollar.services;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import de.wwweasel.WhiteCollar.Exceptions.ApiDeleteException;
 import de.wwweasel.WhiteCollar.dto.PaintingDTO;
 import de.wwweasel.WhiteCollar.dto.StoreDTO;
 import de.wwweasel.WhiteCollar.entities.Painting;
@@ -17,15 +19,17 @@ public class StoreService {
 	@Autowired
 	StoreRepo repo;
 	
-	public Store save(Store store) {
-		return repo.save(store);
+	public StoreDTO save(StoreDTO dto) {
+		return convertToDTO( repo.save( convertToStore(dto) ) );
 	}
 	
-	public void delete(Integer id) {
+	public void delete(Integer id) throws ApiDeleteException{
 		Optional<Store> storeOpt = repo.findById(id);
 		if(storeOpt.isPresent()) {
 			Store store = storeOpt.get();
 			repo.delete(store);
+		}else {
+			throw new ApiDeleteException("Could not delete Store with ID: " + id);
 		}
 	}
 	
@@ -38,8 +42,11 @@ public class StoreService {
 		return store;
 	}
 	
-	public List<Store> findAll(){
-		return repo.findAll();
+	public List<StoreDTO> findAll(){
+		return repo.findAll()
+				.stream()
+				.map(store -> convertToDTO(store) )
+				.collect(Collectors.toList());
 	}
 	
 	public List<Painting> listPaintingsFromStoreId(Integer storeId){
@@ -54,7 +61,7 @@ public class StoreService {
 		return dto;
 	}
 	
-	public Store convertToPainting(StoreDTO dto) {
+	public Store convertToStore(StoreDTO dto) {
 		Store store;
 		if(dto.getId()!=null) {
 			store = repo.findById(dto.getId()).get();
