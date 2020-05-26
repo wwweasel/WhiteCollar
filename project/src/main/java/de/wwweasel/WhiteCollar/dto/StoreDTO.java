@@ -2,9 +2,16 @@ package de.wwweasel.WhiteCollar.dto;
 
 public class StoreDTO {
 	
-	private Integer id;
+	private Integer id=null;
 	private String name;
 	private int capacity;
+	
+	public StoreDTO() {}
+	
+	public StoreDTO( String name, int capacity ) {
+		this.name = name;
+		this.capacity = capacity;
+	}
 	
 	public Integer getId() {
 		return id;

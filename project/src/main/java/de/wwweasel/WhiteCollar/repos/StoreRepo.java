@@ -17,4 +17,8 @@ public interface StoreRepo extends JpaRepository<Store, Integer>{
 	@Query("SELECT s.paintings FROM Store s WHERE s.id = :storeId")
 	List<Painting> listPaintingsFromStoreId(Integer storeId);
 	
+	@Query("SELECT COUNT(p) FROM Store s, Painting p WHERE s.id = p.store.id AND s.id = :storeId")
+	Integer paintingsCount(Integer storeId);
+	
+	
 }

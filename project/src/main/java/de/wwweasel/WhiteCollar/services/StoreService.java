@@ -17,10 +17,14 @@ import de.wwweasel.WhiteCollar.repos.StoreRepo;
 @Service
 public class StoreService {
 	@Autowired
-	StoreRepo repo;
+	private StoreRepo repo;
 	
 	public StoreDTO save(StoreDTO dto) {
 		return convertToDTO( repo.save( convertToStore(dto) ) );
+	}
+	
+	public Integer paintingsCount(Integer storeId) {
+		return repo.paintingsCount(storeId);
 	}
 	
 	public void delete(Integer id) throws ApiDeleteException{

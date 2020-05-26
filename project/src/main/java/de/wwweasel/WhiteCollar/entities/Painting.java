@@ -44,8 +44,10 @@ public class Painting{
 // Constructors
 	public Painting() {}
 	
-	public Painting(String name) {
-		
+	public Painting( String authorName, String name, int price) {
+		this.authorName = authorName;
+		this.name = name;
+		this.price = price;
 	}
 	
 // Getters and Setters

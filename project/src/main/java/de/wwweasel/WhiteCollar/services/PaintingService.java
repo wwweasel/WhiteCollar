@@ -25,8 +25,9 @@ public class PaintingService {
 	
 	public PaintingDTO save(PaintingDTO dto) throws ApiRequestException{
 		Painting painting = convertToPainting(dto);
-		Store store = storeRepo.findById( painting.getStore().getId() ).get();
-		if( store.getPaintings().size() >= store.getCapacity() ) {
+		Store store = storeRepo.findById( painting.getStore().getId() ).get();		
+		
+		if( storeRepo.paintingsCount(store.getId()) >= store.getCapacity() ) { // @Query -> paintingsCount()
 			throw new ApiRequestException("StoreCapacity full!");
 		}else {
 			return convertToDTO( repo.save(painting) );		

@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 
 public class PaintingDTO {
 	
-	private Integer id;
+	private Integer id=null;
 	
 	private String authorName = "Anonymous";
 	
@@ -16,7 +16,15 @@ public class PaintingDTO {
 	private LocalDateTime creationDateTime;
 		
 	private Integer shopId;
-
+	
+	public PaintingDTO() {}
+	
+	public PaintingDTO( String authorName, String name, int price, Integer shopId) {
+		this.authorName = authorName;
+		this.name = name;
+		this.price = price;
+		this.shopId = shopId;
+	}
 
 	public Integer getId() {
 		return id;
