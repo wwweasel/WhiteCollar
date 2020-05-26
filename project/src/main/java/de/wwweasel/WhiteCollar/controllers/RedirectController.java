@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class RedirectController {
 	
 	@RequestMapping("*")
-	public String dedirect() {
+	public String redirect() {
 		return "redirect:/stores/";
 	}
 }

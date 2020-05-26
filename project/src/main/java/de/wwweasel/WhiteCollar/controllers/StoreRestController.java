@@ -35,7 +35,7 @@ public class StoreRestController {
 	
 	
 	// GET 
-	@RequestMapping(method=RequestMethod.GET,value={"/stores","/stores/"})
+	@RequestMapping(method=RequestMethod.GET,value={"/stores/"})
 	public List<StoreDTO> index() {
 		return storeService.findAll();
 	}
